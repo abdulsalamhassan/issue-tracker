@@ -14,4 +14,5 @@ Backend (Express):
 4. npm run dev
 
 Notes:
-- This repository contains only scaffolding and configuration. No business logic is implemented yet.
+- Backend business logic is implemented for auth, projects, and issues.
+- Frontend is fully integrated with auth, projects, and issues API flows.

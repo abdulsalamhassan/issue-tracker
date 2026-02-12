@@ -20,9 +20,9 @@ app.use(cookieParser());
 
 // Basic routes
 app.use("/health", healthRouter);
-app.use("/auth", authRouter);
-app.use("/projects", projectRouter);
-app.use(issueRouter);
+app.use("/api/auth", authRouter);
+app.use("/api/projects", projectRouter);
+app.use("/api", issueRouter);
 
 // Centralized error handler
 app.use(errorHandler);

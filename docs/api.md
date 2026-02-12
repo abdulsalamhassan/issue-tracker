@@ -13,7 +13,7 @@ Request body:
 
 Response 201:
 ```
-{ "user": { "id": "<userId>", "name": "...", "email": "..." } }
+{ "token": "<jwt>", "user": { "id": "<userId>", "name": "...", "email": "..." } }
 ```
 
 Error cases:
@@ -40,7 +40,7 @@ Error cases:
 
 ## Projects
 
-Note: Protected endpoints require `Authorization: Bearer <token>` header.
+Note: Protected endpoints accept either `Authorization: Bearer <token>` or auth cookie.
 
 ### POST /api/projects
 
@@ -60,7 +60,7 @@ Error cases:
 - 409: duplicate key
 - 500: server error
 
-### GET /api/projects/:id
+### GET /api/projects/:projectId
 
 Response 200:
 ```
@@ -71,17 +71,26 @@ Error cases:
 - 401/403: unauthorized or forbidden
 - 404: project not found
 
+### POST /api/projects/:projectId/members
+
+Request body:
+- `memberId` (string - user id, required)
+
+Response 200:
+```
+{ "project": { "id": "<projectId>", "members": ["<userId>"] } }
+```
+
 
 ## Issues
 
-Note: Protected endpoints require `Authorization: Bearer <token>` header.
+Note: Protected endpoints accept either `Authorization: Bearer <token>` or auth cookie.
 
-### POST /api/issues
+### POST /api/projects/:projectId/issues
 
 Request body:
 - `title` (string, required)
 - `description` (string, optional)
-- `project` (string - projectId, required)
 - `assignees` (array of userIds, optional)
 - `priority` (string: low|medium|high|critical)
 
@@ -96,19 +105,21 @@ Error cases:
 - 404: project not found
 - 500: server error
 
-### GET /api/issues?project=<id>&status=<status>
+### GET /api/projects/:projectId/issues
 
 Query params:
-- `project` (optional) filter by project id
-- `status` (optional) filter by status
+- `status` (optional)
+- `priority` (optional)
+- `assignedTo` (optional user id)
+- `page` (optional, default `1`)
+- `limit` (optional, max `100`)
 
 Response 200:
 ```
-{ "issues": [ { "id": "...", "title": "...", "status": "..." } ] }
+{ "items": [ { "id": "...", "title": "...", "status": "..." } ], "total": 12, "page": 1, "limit": 20 }
 ```
 
-
-### GET /api/issues/:id
+### GET /api/issues/:issueId
 
 Response 200:
 ```
@@ -117,6 +128,16 @@ Response 200:
 
 Error cases:
 - 404: issue not found
+
+### PATCH /api/issues/:issueId/status
+
+Request body:
+- `status` (string: open|in_progress|closed|archived)
+
+### PATCH /api/issues/:issueId/assign
+
+Request body:
+- `assigneeId` (string - user id)
 
 
 ## Health

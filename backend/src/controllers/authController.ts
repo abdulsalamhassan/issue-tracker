@@ -22,7 +22,7 @@ export async function registerController(req: Request, res: Response) {
         // issue token
         const { token } = await loginUser(email, password);
         res.cookie(COOKIE_NAME, token, COOKIE_OPTIONS as any);
-        return res.status(201).json({ user });
+        return res.status(201).json({ token, user });
     } catch (err: any) {
         if (err.message === "EMAIL_EXISTS") return res.status(409).json({ message: "Email already registered" });
         return res.status(500).json({ message: "Internal server error" });
@@ -39,7 +39,7 @@ export async function loginController(req: Request, res: Response) {
     try {
         const { token, user } = await loginUser(email, password);
         res.cookie(COOKIE_NAME, token, COOKIE_OPTIONS as any);
-        return res.json({ user });
+        return res.json({ token, user });
     } catch (err: any) {
         if (err.message === "INVALID_CREDENTIALS") return res.status(401).json({ message: "Invalid credentials" });
         return res.status(500).json({ message: "Internal server error" });

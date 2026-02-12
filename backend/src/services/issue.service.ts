@@ -49,6 +49,21 @@ export async function getIssuesForProject(projectId: string | Types.ObjectId, fi
     return { items, total, page, limit };
 }
 
+export async function getIssueById(issueId: string | Types.ObjectId, actorId: string | Types.ObjectId) {
+    const issue = await Issue.findById(issueId).lean();
+    if (!issue) throw new Error("NOT_FOUND");
+
+    const project = await Project.findById(issue.project).select("owner members").lean();
+    if (!project) throw new Error("PROJECT_NOT_FOUND");
+
+    const actor = String(actorId);
+    const isOwner = String(project.owner) === actor;
+    const isMember = Array.isArray(project.members) && project.members.map(String).includes(actor);
+    if (!isOwner && !isMember) throw new Error("FORBIDDEN");
+
+    return issue;
+}
+
 export async function updateIssueStatus(issueId: string | Types.ObjectId, newStatus: IssueStatus, actorId?: string) {
     const issue = await Issue.findById(issueId);
     if (!issue) throw new Error("NOT_FOUND");
@@ -67,11 +82,17 @@ export async function updateIssueStatus(issueId: string | Types.ObjectId, newSta
     return { id: String(issue._id), status: issue.status };
 }
 
-export async function assignIssue(issueId: string | Types.ObjectId, assigneeId: string | Types.ObjectId) {
+export async function assignIssue(issueId: string | Types.ObjectId, assigneeId: string | Types.ObjectId, actorId: string | Types.ObjectId) {
     const issue = await Issue.findById(issueId);
     if (!issue) throw new Error("NOT_FOUND");
-    const project = await Project.findById(issue.project).select("members");
+    const project = await Project.findById(issue.project).select("owner members");
     if (!project) throw new Error("PROJECT_NOT_FOUND");
+
+    const actorStr = String(actorId);
+    const isOwner = String(project.owner) === actorStr;
+    const isReporter = String(issue.reporter) === actorStr;
+    if (!isOwner && !isReporter) throw new Error("FORBIDDEN");
+
     const assigneeStr = String(assigneeId);
     if (!project.members.map(String).includes(assigneeStr)) throw new Error("ASSIGNEE_NOT_MEMBER");
     if (issue.assignees.map(String).includes(assigneeStr)) return { id: String(issue._id), assignees: issue.assignees.map(String) };

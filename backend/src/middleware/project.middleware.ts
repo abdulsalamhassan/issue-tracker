@@ -23,20 +23,7 @@ export async function projectOwnerOnly(req: ReqWithUser, res: Response, next: Ne
     const { projectId } = req.params;
     if (!userId) return res.status(401).json({ message: "Unauthorized" });
     const proj = await Project.findById(projectId).select("owner").lean();
-    if (!proj) return res.status(404).json({ error: "Project not found" });
+    if (!proj) return res.status(404).json({ message: "Project not found" });
     if (String(proj.owner) !== String(userId)) return res.status(403).json({ message: "Forbidden" });
-    return next();
-}
-
-export async function projectMemberOnly(req: ReqWithUser, res: Response, next: NextFunction) {
-    const userId = req.userId;
-    const { projectId } = req.params;
-    if (!userId) return res.status(401).json({ message: "Unauthorized" });
-    const proj = await Project.findById(projectId).select("owner members").lean();
-    if (!proj) return res.status(404).json({ error: "Project not found" });
-    const uid = String(userId);
-    const isOwner = String(proj.owner) === uid;
-    const isMember = Array.isArray(proj.members) && proj.members.map(String).includes(uid);
-    if (!isOwner && !isMember) return res.status(403).json({ message: "Forbidden" });
     return next();
 }

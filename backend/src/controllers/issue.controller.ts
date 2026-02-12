@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { body, validationResult, query } from "express-validator";
-import { createIssue, getIssuesForProject, updateIssueStatus, assignIssue } from "../services/issue.service";
+import { createIssue, getIssuesForProject, updateIssueStatus, assignIssue, getIssueById } from "../services/issue.service";
 
 export const createValidators = [
     body("title").isString().notEmpty(),
@@ -49,6 +49,21 @@ export async function listIssuesController(req: Request, res: Response) {
     }
 }
 
+export async function getIssueController(req: Request, res: Response) {
+    const userId = (req as any).userId;
+    if (!userId) return res.status(401).json({ message: "Unauthorized" });
+    const { issueId } = req.params;
+    try {
+        const issue = await getIssueById(issueId, userId);
+        return res.json({ issue });
+    } catch (err: any) {
+        if (err.message === "NOT_FOUND") return res.status(404).json({ message: "Issue not found" });
+        if (err.message === "PROJECT_NOT_FOUND") return res.status(404).json({ message: "Project not found" });
+        if (err.message === "FORBIDDEN") return res.status(403).json({ message: "Access denied" });
+        return res.status(500).json({ message: "Internal server error" });
+    }
+}
+
 export const statusValidators = [body("status").isIn(["open", "in_progress", "closed", "archived"])];
 
 export async function updateStatusController(req: Request, res: Response) {
@@ -79,11 +94,12 @@ export async function assignController(req: Request, res: Response) {
     const { issueId } = req.params;
     const { assigneeId } = req.body;
     try {
-        const result = await assignIssue(issueId, assigneeId);
+        const result = await assignIssue(issueId, assigneeId, userId);
         return res.json(result);
     } catch (err: any) {
         if (err.message === "NOT_FOUND") return res.status(404).json({ message: "Issue not found" });
         if (err.message === "PROJECT_NOT_FOUND") return res.status(404).json({ message: "Project not found" });
+        if (err.message === "FORBIDDEN") return res.status(403).json({ message: "Forbidden" });
         if (err.message === "ASSIGNEE_NOT_MEMBER") return res.status(403).json({ message: "Assignee must be a project member" });
         return res.status(500).json({ message: "Internal server error" });
     }

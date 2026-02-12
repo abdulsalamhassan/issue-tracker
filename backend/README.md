@@ -1,4 +1,4 @@
-# Backend — Issue & Feature Tracking System
+# Backend — DevTrack
 
 Tech stack
 - Node.js
@@ -28,8 +28,7 @@ Base API URL
 - `http://localhost:4000`
 
 Notes
-- JWT tokens are stored in HTTP-only cookies by default.
+- API endpoints are mounted under `/api` (for example `/api/auth/login`).
+- JWT auth supports both HTTP-only cookie and `Authorization: Bearer <token>`.
 - All write operations validate input and return normalized JSON errors: `{ "message": "..." }`.
 - Centralized error handling ensures consistent responses and hides internal stack traces in production.
-
-*** End of README

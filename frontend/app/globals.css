@@ -8,8 +8,79 @@ body,
     height: 100%;
 }
 
-/* Global minimal reset */
 body {
     margin: 0;
-    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+    font-family: "Segoe UI", Inter, -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+    color: #0f172a;
+    background-color: #f1f5f9;
+}
+
+@layer base {
+    h1,
+    h2,
+    h3 {
+        letter-spacing: -0.01em;
+    }
+}
+
+@layer components {
+    .dt-page {
+        @apply space-y-6 lg:space-y-7;
+    }
+
+    .dt-card {
+        @apply rounded-md border border-slate-200 bg-white shadow-sm;
+    }
+
+    .dt-panel {
+        @apply rounded-md border border-slate-200 bg-white px-5 py-4 shadow-sm;
+    }
+
+    .dt-title {
+        @apply text-[28px] font-semibold leading-8 text-slate-900;
+    }
+
+    .dt-subtitle {
+        @apply mt-1 text-sm text-slate-600;
+    }
+
+    .dt-label {
+        @apply text-sm font-medium text-slate-700;
+    }
+
+    .dt-input {
+        @apply w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition-colors focus:border-blue-500;
+    }
+
+    .dt-select {
+        @apply rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition-colors focus:border-blue-500;
+    }
+
+    .dt-btn-primary {
+        @apply rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:opacity-60;
+    }
+
+    .dt-btn-secondary {
+        @apply rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 disabled:opacity-60;
+    }
+
+    .dt-btn-ghost {
+        @apply rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-50 disabled:opacity-60;
+    }
+
+    .dt-table {
+        @apply min-w-full text-left text-sm;
+    }
+
+    .dt-thead {
+        @apply border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wide text-slate-500;
+    }
+
+    .dt-row {
+        @apply border-b border-slate-100 last:border-0;
+    }
+
+    .dt-kpi {
+        @apply dt-card p-5;
+    }
 }

@@ -1,6 +1,6 @@
 # Design Notes
 
-Placeholder for high-level design and architecture decisions for the Issue & Feature Tracking System.
+Placeholder for high-level design and architecture decisions for DevTrack.
 
 Sections to add:
 - Domain models

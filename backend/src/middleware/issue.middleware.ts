@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { Types } from "mongoose";
 import { Project } from "../models/Project";
-import { Issue } from "../models/Issue";
 
 export function validateProjectIdParam(req: Request, res: Response, next: NextFunction) {
     const { projectId } = req.params;
@@ -25,14 +24,5 @@ export async function ensureProjectMember(req: Request & { userId?: string }, re
     const isOwner = String(proj.owner) === uid;
     const isMember = Array.isArray(proj.members) && proj.members.map(String).includes(uid);
     if (!isOwner && !isMember) return res.status(403).json({ message: "Access denied" });
-    return next();
-}
-
-export async function ensureIssueBelongsToProject(req: Request, res: Response, next: NextFunction) {
-    const { projectId, issueId } = req.params;
-    const issue = await Issue.findById(issueId).select("project").lean();
-    if (!issue) return res.status(404).json({ message: "Issue not found" });
-    if (!projectId) return res.status(400).json({ message: "Missing projectId" });
-    if (String(issue.project) !== String(projectId)) return res.status(400).json({ message: "Issue does not belong to project" });
     return next();
 }

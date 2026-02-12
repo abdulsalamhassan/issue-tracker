@@ -1,4 +1,4 @@
-// File: C:\Users\cshii\OneDrive\Desktop\Feature Tracking System\issue-tracker\frontend\app\page.tsx
+// File: C:\Users\cshii\OneDrive\Desktop\issue-tracker\frontend\app\page.tsx
 import * as entry from '../../../app/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 
