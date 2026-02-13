@@ -1,5 +1,11 @@
 {
+  "/_not-found": "app/_not-found.js",
+  "/icon.png/route": "app/icon.png/route.js",
   "/login/page": "app/login/page.js",
+  "/dashboard/page": "app/dashboard/page.js",
+  "/page": "app/page.js",
+  "/projects/[projectId]/issues/[issueId]/page": "app/projects/[projectId]/issues/[issueId]/page.js",
+  "/projects/[projectId]/issues/page": "app/projects/[projectId]/issues/page.js",
   "/projects/page": "app/projects/page.js",
-  "/dashboard/page": "app/dashboard/page.js"
+  "/register/page": "app/register/page.js"
 }

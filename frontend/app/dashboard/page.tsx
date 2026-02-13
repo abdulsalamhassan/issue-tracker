@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getProjects, getDashboardMetrics } from "../../lib/api";
-import type { Project } from "../../types";
+import type { Project, ProjectsResponse } from "../../types";
 import LoadingState from "../../components/LoadingState";
 import ErrorState from "../../components/ErrorState";
 
@@ -22,7 +22,7 @@ type DashboardMetrics = {
 
 
 export default function DashboardPage() {
-    const projectsQuery = useQuery({
+    const projectsQuery = useQuery<ProjectsResponse>({
         queryKey: ["projects"],
         queryFn: getProjects
     });
@@ -32,10 +32,9 @@ export default function DashboardPage() {
         return projectsQuery.data.projects.slice(0, 5);
     }, [projectsQuery.data?.projects]);
 
-    const metricsQuery = useQuery({
+    const metricsQuery = useQuery<DashboardMetrics>({
         queryKey: ["dashboard-metrics"],
-        enabled: projectsQuery.data?.projects?.length > 0,
-        keepPreviousData: true,
+        enabled: Boolean(projectsQuery.data?.projects?.length),
         staleTime: 2 * 60 * 1000,
         queryFn: getDashboardMetrics
     });
