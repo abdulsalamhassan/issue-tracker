@@ -99,7 +99,7 @@ export default function LoginPage() {
                     <p className="mt-4 text-sm text-slate-600">
                         No account?{" "}
                         <Link href="/register" className="font-medium text-blue-700 hover:text-blue-800">
-                            Create one
+                            Create new one
                         </Link>
                     </p>
                 </div>
