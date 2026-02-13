@@ -114,7 +114,3 @@ The `render.yaml` blueprint configures the backend service for Render. Key notes
 ## Contributing
 
 Pull requests are welcome. Please open an issue for large changes before implementing.
-
-## License
-
-This project is provided under the MIT License. Add a `LICENSE` file if you intend to publish under MIT.
