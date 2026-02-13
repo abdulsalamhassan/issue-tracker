@@ -13,12 +13,23 @@ import type {
 } from "../types";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api";
+const DEFAULT_TIMEOUT_MS = 10000;
 
 type ApiErrorBody = {
     message?: string;
     error?: string;
     errors?: Array<{ msg?: string }>;
 };
+
+export class ApiRequestError extends Error {
+    status?: number;
+
+    constructor(message: string, status?: number) {
+        super(message);
+        this.name = "ApiRequestError";
+        this.status = status;
+    }
+}
 
 function toErrorMessage(raw: string, statusText: string): string {
     if (!raw) return statusText || "Request failed";
@@ -34,18 +45,41 @@ function toErrorMessage(raw: string, statusText: string): string {
 }
 
 export async function apiFetch<T = unknown>(path: string, init?: RequestInit): Promise<T> {
-    const res = await fetch(`${API_BASE}${path}`, {
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json",
-            ...(init?.headers || {})
-        },
-        ...init
-    });
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), DEFAULT_TIMEOUT_MS);
+
+    if (init?.signal) {
+        if (init.signal.aborted) {
+            controller.abort();
+        } else {
+            init.signal.addEventListener("abort", () => controller.abort(), { once: true });
+        }
+    }
+
+    let res: Response;
+
+    try {
+        res = await fetch(`${API_BASE}${path}`, {
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json",
+                ...(init?.headers || {})
+            },
+            ...init,
+            signal: controller.signal
+        });
+    } catch (error) {
+        if (error instanceof Error && error.name === "AbortError") {
+            throw new ApiRequestError("Request timed out. Please try again.");
+        }
+        throw new ApiRequestError("Network error. Please check your connection and try again.");
+    } finally {
+        clearTimeout(timeout);
+    }
 
     if (!res.ok) {
         const text = await res.text();
-        throw new Error(toErrorMessage(text, res.statusText));
+        throw new ApiRequestError(toErrorMessage(text, res.statusText), res.status);
     }
 
     if (res.status === 204) {
@@ -81,6 +115,18 @@ export function logout() {
 
 export function getProjects() {
     return apiFetch<ProjectsResponse>("/projects");
+}
+
+export function getDashboardMetrics() {
+    return apiFetch<{
+        totalIssues: number;
+        inProgress: number;
+        done: number;
+        open: number;
+        archived: number;
+        projectsInProgress: number;
+        projectsDone: number;
+    }>("/projects/metrics");
 }
 
 export function createProject(payload: { name: string; key: string; description?: string }) {

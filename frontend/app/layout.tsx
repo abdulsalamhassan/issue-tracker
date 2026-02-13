@@ -28,6 +28,10 @@ function AppShell({ children }: { children: React.ReactNode }) {
         return <main className="min-h-screen bg-slate-100">{children}</main>;
     }
 
+    if (showProtectedLoader) {
+        return <LoadingState label="Checking session..." fullScreen />;
+    }
+
     return (
         <div className="flex min-h-screen bg-slate-100">
             <Sidebar />
@@ -35,7 +39,7 @@ function AppShell({ children }: { children: React.ReactNode }) {
                 <Navbar user={user} />
                 <main className="px-6 py-6 lg:px-8">
                     <div className="mx-auto w-full max-w-[1200px]">
-                    {showProtectedLoader ? <LoadingState label="Loading session..." /> : children}
+                        {children}
                     </div>
                 </main>
             </div>

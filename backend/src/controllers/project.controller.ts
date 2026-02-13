@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { body, validationResult } from "express-validator";
 import { createProject, getProjectsForUser, getProjectById, addMemberToProject } from "../services/project.service";
+import { getDashboardMetricsForUser } from "../services/metrics.service";
 
 export const createValidators = [
     body("name").isString().notEmpty(),
@@ -49,6 +50,17 @@ export async function addMemberController(req: Request, res: Response) {
     } catch (err: any) {
         if (err.message === "NOT_FOUND") return res.status(404).json({ message: "Project not found" });
         if (err.message === "FORBIDDEN") return res.status(403).json({ message: "Only owner can add members" });
+        return res.status(500).json({ message: "Internal server error" });
+    }
+}
+
+export async function getDashboardMetricsController(req: Request, res: Response) {
+    const userId = (req as any).userId;
+    if (!userId) return res.status(401).json({ message: "Unauthorized" });
+    try {
+        const metrics = await getDashboardMetricsForUser(userId);
+        return res.json(metrics);
+    } catch (err: any) {
         return res.status(500).json({ message: "Internal server error" });
     }
 }

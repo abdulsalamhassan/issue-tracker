@@ -3,13 +3,11 @@
 import Link from "next/link";
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { getIssues, getProjects } from "../../lib/api";
-import type { IssueStatus } from "../../types";
+import { getProjects, getDashboardMetrics } from "../../lib/api";
 import type { Project } from "../../types";
 import LoadingState from "../../components/LoadingState";
 import ErrorState from "../../components/ErrorState";
 
-type StatusCounts = Record<IssueStatus, number>;
 
 type DashboardMetrics = {
     totalIssues: number;
@@ -21,7 +19,7 @@ type DashboardMetrics = {
     projectsDone: number;
 };
 
-const ISSUE_STATUSES: IssueStatus[] = ["open", "in_progress", "closed", "archived"];
+
 
 export default function DashboardPage() {
     const projectsQuery = useQuery({
@@ -34,43 +32,12 @@ export default function DashboardPage() {
         return projectsQuery.data.projects.slice(0, 5);
     }, [projectsQuery.data?.projects]);
 
-    const projectIds = useMemo(() => {
-        return projectsQuery.data?.projects.map((project) => project.id) ?? [];
-    }, [projectsQuery.data?.projects]);
-
     const metricsQuery = useQuery({
-        queryKey: ["dashboard-metrics", projectIds],
-        enabled: projectIds.length > 0,
-        queryFn: async (): Promise<DashboardMetrics> => {
-            const perProjectStatus = await Promise.all(
-                projectIds.map(async (projectId) => {
-                    const counts: StatusCounts = { open: 0, in_progress: 0, closed: 0, archived: 0 };
-                    await Promise.all(
-                        ISSUE_STATUSES.map(async (status) => {
-                            const result = await getIssues(projectId, { status, page: 1, limit: 1 });
-                            counts[status] = result.total;
-                        })
-                    );
-                    return counts;
-                })
-            );
-
-            return perProjectStatus.reduce<DashboardMetrics>(
-                (acc, counts) => {
-                    const hasInProgressWork = counts.open + counts.in_progress > 0;
-                    const hasCompletedWork = !hasInProgressWork && counts.closed > 0;
-                    acc.open += counts.open;
-                    acc.inProgress += counts.in_progress;
-                    acc.done += counts.closed;
-                    acc.archived += counts.archived;
-                    acc.projectsInProgress += hasInProgressWork ? 1 : 0;
-                    acc.projectsDone += hasCompletedWork ? 1 : 0;
-                    acc.totalIssues += counts.open + counts.in_progress + counts.closed + counts.archived;
-                    return acc;
-                },
-                { totalIssues: 0, inProgress: 0, done: 0, open: 0, archived: 0, projectsInProgress: 0, projectsDone: 0 }
-            );
-        }
+        queryKey: ["dashboard-metrics"],
+        enabled: projectsQuery.data?.projects?.length > 0,
+        keepPreviousData: true,
+        staleTime: 2 * 60 * 1000,
+        queryFn: getDashboardMetrics
     });
 
     const completionRate = useMemo(() => {

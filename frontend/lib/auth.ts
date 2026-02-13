@@ -17,7 +17,20 @@ export function useMeQuery(enabled = true) {
         queryKey: ["me"],
         queryFn: getMe,
         enabled,
-        staleTime: 5 * 60 * 1000
+        // If we have a cached session in localStorage, return it immediately
+        initialData: typeof window !== "undefined" ? (() => {
+            try {
+                const raw = localStorage.getItem("me");
+                return raw ? JSON.parse(raw) as { user: unknown } : undefined;
+            } catch {
+                return undefined;
+            }
+        })() : undefined,
+        staleTime: 5 * 60 * 1000,
+        retry: false,
+        refetchOnWindowFocus: false,
+        // Revalidate in background on mount if cached
+        refetchOnMount: true
     });
 }
 
@@ -48,5 +61,8 @@ export function useAuthGuard() {
 
 export async function logoutUser(queryClient: ReturnType<typeof useQueryClient>) {
     await logout();
+    try {
+        localStorage.removeItem("me");
+    } catch { }
     queryClient.clear();
 }

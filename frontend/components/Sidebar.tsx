@@ -29,7 +29,7 @@ export default function Sidebar() {
         <aside className="hidden w-64 shrink-0 border-r border-slate-200 bg-white lg:flex lg:flex-col">
             <div className="h-14 border-b border-slate-200 px-5">
                 <div className="flex h-full items-center gap-2">
-                    <span className="inline-flex h-5 w-5 items-center justify-center rounded-sm bg-blue-600 text-[10px] font-semibold text-white">
+                    <span className="inline-flex h-6 w-6 items-center justify-center rounded-md bg-blue-600 text-[10px] font-bold text-white shadow-sm">
                         IT
                     </span>
                     <span className="text-sm font-semibold text-slate-900">DevTrack</span>
@@ -47,7 +47,7 @@ export default function Sidebar() {
                                     href={item.href}
                                     className={`block rounded-md px-3 py-2.5 text-sm ${
                                         active
-                                            ? "border-l-2 border-blue-600 bg-blue-50 font-medium text-blue-800 shadow-sm"
+                                            ? "border-l-2 border-blue-600 bg-blue-50 font-semibold text-blue-800 shadow-sm"
                                             : "border-l-2 border-transparent text-slate-600 hover:bg-slate-100 hover:text-slate-900"
                                     }`}
                                 >
@@ -68,7 +68,7 @@ export default function Sidebar() {
                                 href={issuesHref}
                                 className={`block rounded-md px-3 py-2.5 text-sm ${
                                     pathname.includes("/issues/")
-                                        ? "border-l-2 border-blue-600 bg-blue-50 font-medium text-blue-800 shadow-sm"
+                                        ? "border-l-2 border-blue-600 bg-blue-50 font-semibold text-blue-800 shadow-sm"
                                         : "border-l-2 border-transparent text-slate-600 hover:bg-slate-100 hover:text-slate-900"
                                 }`}
                             >

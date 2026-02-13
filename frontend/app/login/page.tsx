@@ -16,7 +16,12 @@ export default function LoginPage() {
 
     const loginMutation = useMutation({
         mutationFn: login,
-        onSuccess: async () => {
+        onSuccess: async (data) => {
+            try {
+                if (typeof window !== "undefined") {
+                    localStorage.setItem("me", JSON.stringify({ user: data.user }));
+                }
+            } catch { }
             await queryClient.invalidateQueries({ queryKey: ["me"] });
             router.push("/dashboard");
         },
@@ -32,11 +37,11 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen bg-slate-100">
-            <header className="h-14 border-b border-slate-200 bg-white">
+        <div className="min-h-screen bg-gradient-to-b from-slate-100 via-slate-100 to-blue-50">
+            <header className="h-14 border-b border-slate-200 bg-white/95 backdrop-blur">
                 <div className="flex h-full items-center justify-between px-6">
                     <div className="flex items-center gap-2">
-                        <span className="inline-flex h-5 w-5 items-center justify-center rounded-sm bg-blue-600 text-[10px] font-semibold text-white">
+                        <span className="inline-flex h-6 w-6 items-center justify-center rounded-md bg-blue-600 text-[10px] font-bold text-white shadow-sm">
                             IT
                         </span>
                         <span className="text-sm font-semibold text-slate-900">DevTrack</span>
@@ -46,9 +51,9 @@ export default function LoginPage() {
             </header>
 
             <div className="flex min-h-[calc(100vh-56px)] items-center justify-center px-6">
-                <div className="dt-card w-full max-w-md p-7">
+                <div className="dt-card w-full max-w-md p-7 shadow-md">
                     <h1 className="text-2xl font-semibold text-slate-900">Sign in to DevTrack</h1>
-                    <p className="mt-1 text-sm text-slate-600">Enter your credentials to manage your issues.</p>
+                    <p className="mt-1 text-sm text-slate-600">Enter your credentials to continue to your workspace.</p>
 
                     <form onSubmit={onSubmit} className="mt-6 space-y-4">
                         <div className="space-y-1">
@@ -61,7 +66,7 @@ export default function LoginPage() {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 className="dt-input"
-                                placeholder="name@company.com"
+                                placeholder="name@gmail.com"
                                 required
                             />
                         </div>
@@ -74,6 +79,7 @@ export default function LoginPage() {
                                 id="password"
                                 type="password"
                                 value={password}
+                                placeholder="Enter Password"
                                 onChange={(e) => setPassword(e.target.value)}
                                 className="dt-input"
                                 required
